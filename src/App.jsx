@@ -6,11 +6,12 @@ gsap.registerPlugin(ScrollTrigger);
 const projects = [
   {
     n: "01",
-    title: "AMIS Student Portal",
-    category: "Student Experience",
-    stack: "Laravel · Microsoft 365 · MySQL",
-    desc: "A unified digital space for student records, learning resources, announcements, and school services.",
-    type: "student",
+    title: "AMIS School Website",
+    category: "Institutional Website",
+    stack: "Laravel · JavaScript · Responsive UI",
+    desc: "The public digital home of Al Munawwara Islamic School—bringing admissions, academics, school updates, and community information into one accessible experience.",
+    type: "school",
+    url: "https://amis.edu.ph",
   },
   {
     n: "02",
@@ -353,6 +354,23 @@ function Hero() {
 }
 
 function Preview({ type }) {
+  if (type === "school") {
+    return (
+      <div className="preview school-preview">
+        <div className="preview-top">
+          <span />
+          <span />
+          <span />
+          <b>amis.edu.ph</b>
+        </div>
+        <img
+          src="/assets/projects/amis-school-website.png"
+          alt="AMIS School Website homepage"
+          loading="lazy"
+        />
+      </div>
+    );
+  }
   return (
     <div className={`preview ${type}`}>
       <div className="preview-top">
@@ -415,6 +433,16 @@ function ProjectSection() {
               <h3>{p.title}</h3>
               <p>{p.desc}</p>
               <b>{p.stack}</b>
+              {p.url && (
+                <a
+                  className="project-live"
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View live website <span>↗</span>
+                </a>
+              )}
             </div>
             <div className="preview-mask">
               <Preview type={p.type} />
