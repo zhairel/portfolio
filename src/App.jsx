@@ -20,6 +20,7 @@ const projects = [
     stack: "Laravel · JavaScript · MariaDB",
     desc: "A multi-step enrollment workflow that turns complex admission processes into a clear, trackable experience.",
     type: "enroll",
+    url: "https://enrollment.amis.edu.ph/",
   },
   {
     n: "03",
@@ -354,20 +355,28 @@ function Hero() {
 }
 
 function Preview({ type }) {
-  if (type === "school") {
+  const realPreview = {
+    school: [
+      "amis.edu.ph",
+      "/assets/projects/amis-school-website.png",
+      "AMIS School Website homepage",
+    ],
+    enroll: [
+      "enrollment.amis.edu.ph",
+      "/assets/projects/amis-online-enrollment.png",
+      "AMIS Online Enrollment login interface",
+    ],
+  }[type];
+  if (realPreview) {
     return (
       <div className="preview school-preview">
         <div className="preview-top">
           <span />
           <span />
           <span />
-          <b>amis.edu.ph</b>
+          <b>{realPreview[0]}</b>
         </div>
-        <img
-          src="/assets/projects/amis-school-website.png"
-          alt="AMIS School Website homepage"
-          loading="lazy"
-        />
+        <img src={realPreview[1]} alt={realPreview[2]} loading="lazy" />
       </div>
     );
   }
@@ -467,8 +476,10 @@ function ExperienceSection() {
       </header>
       <div className="timeline">
         <i className="timeline-progress" />
+        <i className="timeline-runner" />
         {experience.map((e, i) => (
           <article key={e[1]}>
+            <i className="timeline-node" />
             <b>0{i + 1}</b>
             <span>{e[0]}</span>
             <div>
@@ -532,7 +543,6 @@ function TechnologyGlobe() {
           node.style.transform = `translate3d(${x1 * radius}px,${y2 * radius}px,0) scale(${scale})`;
           node.style.opacity = String(0.28 + depth * 0.72);
           node.style.zIndex = String(Math.round(depth * 100));
-          node.style.filter = `brightness(${0.62 + depth * 0.55})`;
         });
       }
       frame = requestAnimationFrame(render);
@@ -698,6 +708,116 @@ function SkillsSection() {
   );
 }
 
+function LabPrinciples() {
+  const section = useRef(null);
+  useEffect(() => {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const cards = section.current?.querySelectorAll(".principle-card");
+    if (!cards || reduced) return;
+    const ctx = gsap.context(() => {
+      gsap.from(cards, {
+        scrollTrigger: {
+          trigger: section.current,
+          start: "top 78%",
+          once: true,
+        },
+        y: 70,
+        opacity: 0,
+        rotateX: 8,
+        stagger: 0.12,
+        duration: 0.9,
+        ease: "power3.out",
+      });
+    }, section);
+    const cleanups = [...cards].map((card) => {
+      const move = (event) => {
+        const box = card.getBoundingClientRect();
+        const x = (event.clientX - box.left) / box.width - 0.5;
+        const y = (event.clientY - box.top) / box.height - 0.5;
+        gsap.to(card, {
+          rotateY: x * 3,
+          rotateX: -y * 3,
+          duration: 0.35,
+          ease: "power2.out",
+        });
+      };
+      const leave = () =>
+        gsap.to(card, {
+          rotateX: 0,
+          rotateY: 0,
+          duration: 0.6,
+          ease: "power3.out",
+        });
+      card.addEventListener("pointermove", move);
+      card.addEventListener("pointerleave", leave);
+      return () => {
+        card.removeEventListener("pointermove", move);
+        card.removeEventListener("pointerleave", leave);
+      };
+    });
+    return () => {
+      ctx.revert();
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }, []);
+  const principles = [
+    {
+      no: "01",
+      label: "Human first",
+      title: "Build for people.",
+      text: "Clear interfaces, thoughtful flows, and fewer obstacles between intent and outcome.",
+      icon: "◎",
+    },
+    {
+      no: "02",
+      label: "Connected thinking",
+      title: "Make systems speak.",
+      text: "Frontend, backend, data, and integrations designed as one dependable ecosystem.",
+      icon: "⌁",
+    },
+    {
+      no: "03",
+      label: "Quiet reliability",
+      title: "Keep it resilient.",
+      text: "Fast, maintainable products that continue working when real operations get complicated.",
+      icon: "✦",
+    },
+  ];
+  return (
+    <section className="principles section" ref={section}>
+      <header>
+        <span>04 — How I build</span>
+        <h2>
+          Ideas need
+          <br />
+          <i>good systems.</i>
+        </h2>
+        <p>
+          A practical approach to making digital products useful, connected, and
+          built to last.
+        </p>
+      </header>
+      <div className="principle-grid">
+        {principles.map((item) => (
+          <article className="principle-card" key={item.no}>
+            <div className="card-signal">
+              <span>{item.no}</span>
+              <i />
+              <b>{item.icon}</b>
+            </div>
+            <div>
+              <small>{item.label}</small>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+            <span className="card-corner">↗</span>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Counter({ to, suffix = "" }) {
   const ref = useRef();
   return (
@@ -710,7 +830,7 @@ function AboutSection() {
   return (
     <section id="about" className="about section">
       <div className="about-lead">
-        <span>04 — About the lab</span>
+        <span>05 — About the lab</span>
         <h2>
           “I turn complex workflows into <i>practical digital systems.</i>”
         </h2>
@@ -746,7 +866,7 @@ function ContactSection() {
   return (
     <section id="contact" className="contact section">
       <div className="contact-orb" />
-      <span>05 — Start something useful</span>
+      <span>06 — Start something useful</span>
       <h2>
         Have a system
         <br />
@@ -848,16 +968,27 @@ export default function App() {
           },
           "-=.8",
         );
-      gsap.utils.toArray(".glass-card,.code-card").forEach((el, i) =>
-        gsap.to(el, {
-          y: i % 2 ? -10 : 12,
-          duration: 2.6 + i * 0.2,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        }),
-      );
+      const floatingTweens = gsap.utils
+        .toArray(".glass-card,.code-card")
+        .map((el, i) =>
+          gsap.to(el, {
+            y: i % 2 ? -10 : 12,
+            duration: 2.6 + i * 0.2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          }),
+        );
       const ws = document.querySelector(".workspace");
+      ScrollTrigger.create({
+        trigger: ws,
+        start: "top bottom",
+        end: "bottom top",
+        onEnter: () => floatingTweens.forEach((tween) => tween.resume()),
+        onEnterBack: () => floatingTweens.forEach((tween) => tween.resume()),
+        onLeave: () => floatingTweens.forEach((tween) => tween.pause()),
+        onLeaveBack: () => floatingTweens.forEach((tween) => tween.pause()),
+      });
       const qx = gsap.quickTo(".workspace", "x", {
           duration: 0.8,
           ease: "power3",
@@ -892,12 +1023,12 @@ export default function App() {
           scrollTrigger: {
             trigger: panel,
             start: "top 82%",
-            end: "center 55%",
-            scrub: 0.7,
+            once: true,
           },
-          clipPath: "inset(0 0 100% 0)",
-          scale: 1.08,
-          ease: "none",
+          scale: 0.97,
+          opacity: 0,
+          duration: 0.7,
+          ease: "power2.out",
         });
         gsap.from(panel.querySelector(".project-number"), {
           scrollTrigger: { trigger: panel, start: "top 80%", once: true },
@@ -906,24 +1037,31 @@ export default function App() {
           duration: 1,
         });
       });
-      gsap.to(".timeline-progress", {
-        scrollTrigger: {
-          trigger: ".timeline",
-          start: "top 70%",
-          end: "bottom 65%",
-          scrub: true,
-        },
-        scaleY: 1,
-        ease: "none",
-      });
-      gsap.utils.toArray(".timeline article").forEach((el) =>
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: ".timeline",
+            start: "top 72%",
+            end: "bottom 48%",
+            scrub: 0.35,
+            invalidateOnRefresh: true,
+          },
+        })
+        .to(".timeline-progress", { scaleY: 1, ease: "none" }, 0);
+      gsap.utils.toArray(".timeline article").forEach((el) => {
+        ScrollTrigger.create({
+          trigger: el,
+          start: "top 68%",
+          end: "bottom 35%",
+          toggleClass: "active",
+        });
         gsap.from(el, {
           scrollTrigger: { trigger: el, start: "top 85%", once: true },
           x: 35,
           opacity: 0,
           duration: 0.7,
-        }),
-      );
+        });
+      });
       gsap.from(".globe-stage", {
         scrollTrigger: { trigger: ".skills", start: "top 75%", once: true },
         scale: 0.7,
@@ -970,6 +1108,7 @@ export default function App() {
         <ProjectSection />
         <ExperienceSection />
         <SkillsSection />
+        <LabPrinciples />
         <AboutSection />
         <ContactSection />
       </main>
